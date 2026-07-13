@@ -59,7 +59,7 @@ jobs:
     name: Create Auto Release
     needs: build
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
 
     steps:
       - name: Download Build Artifacts
@@ -72,17 +72,19 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: release-artifacts/GripTrainer-debug.apk
-          name: Release ${{ github.ref_name }}
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || 'latest' }}
+          name: ${{ startsWith(github.ref, 'refs/tags/v') && format('Release {0}', github.ref_name) || 'آخرین نسخه بیلد شده (Latest Build)' }}
           draft: false
-          prerelease: false
+          prerelease: ${{ !startsWith(github.ref, 'refs/tags/v') }}
           body: |
             نسخه آزمایشی تمرینیار هنگبرد با موفقیت بیلد شد. 🎉
             
-            تغییرات این نسخه:
+            ویژگی‌های کلیدی این نسخه:
             - راهنمای کامل برنامه ۱۲ هفته‌ای بدنسازی سنگ‌نوردی
-            - تایمر شمارش معکوس دایره‌ای زیبا
-            - تقویم تمرین صخره‌نورد
-            - ثبت رکوردهای آویزان شدن و بارفیکس
-            - پشتیبانی کامل از زبان فارسی و حالت تاریک (Dark Mode)
+            - تایمر شمارش معکوس دایره‌ای تعاملی و زیبا
+            - تقویم تمرین ۳۶ جلسه‌ای صخره‌نورد به همراه ثبت درجه سختی
+            - ثبت رکوردهای آویزان شدن و تعداد بارفیکس در گزارش پیشرفت
+            - سیستم هشدار و یادآوری منظم روزانه برای تمرینات
+            - پشتیبانی کامل از زبان فارسی، چینش راست‌چین (RTL) و حالت تاریک (Dark Mode) پویا
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
