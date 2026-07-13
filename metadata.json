@@ -1,0 +1,6 @@
+{
+  "name": "تمرینیار هنگبرد",
+  "description": "برنامه تمرینی ۱۲ هفته‌ای هنگبرد و بارفیکس برای صخره‌نوردان و ورزشکاران صعود ورزشی",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

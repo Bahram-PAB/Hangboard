@@ -1,0 +1,322 @@
+package com.example.ui.screens
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.ui.MainViewModel
+
+@Composable
+fun SettingsScreen(viewModel: MainViewModel) {
+    val profile by viewModel.userProfile.collectAsState()
+
+    // Temporary form states
+    var nameState by remember(profile) { mutableStateOf(profile.name) }
+    var ageState by remember(profile) { mutableStateOf(profile.age.toString()) }
+    var heightState by remember(profile) { mutableStateOf(profile.height.toString()) }
+    var weightState by remember(profile) { mutableStateOf(profile.weight.toString()) }
+    var reminderEnabledState by remember(profile) { mutableStateOf(profile.reminderEnabled) }
+    var reminderHourState by remember(profile) { mutableStateOf(profile.reminderHour.toFloat()) }
+    var reminderMinuteState by remember(profile) { mutableStateOf(profile.reminderMinute.toFloat()) }
+    var darkThemeState by remember(profile) { mutableStateOf(profile.isDarkTheme) }
+
+    var showResetDialog by remember { mutableStateOf(false) }
+    var showSavedMessage by remember { mutableStateOf(false) }
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(bottom = 32.dp)
+    ) {
+        // Title
+        item {
+            Text(
+                text = "تنظیمات کاربری",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.ExtraBold,
+                modifier = Modifier.padding(top = 16.dp)
+            )
+        }
+
+        // 1. Profile Information Card
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Text(
+                        text = "اطلاعات کاربری صخره‌نورد",
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    OutlinedTextField(
+                        value = nameState,
+                        onValueChange = { nameState = it },
+                        label = { Text("نام و نام خانوادگی") },
+                        leadingIcon = { Icon(imageVector = Icons.Default.Person, contentDescription = null) },
+                        modifier = Modifier.fillMaxWidth().testTag("settings_name_input"),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = ageState,
+                            onValueChange = { ageState = it },
+                            label = { Text("سن") },
+                            leadingIcon = { Icon(imageVector = Icons.Default.CalendarToday, contentDescription = null) },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+
+                        OutlinedTextField(
+                            value = heightState,
+                            onValueChange = { heightState = it },
+                            label = { Text("قد (سانتی‌متر)") },
+                            leadingIcon = { Icon(imageVector = Icons.Default.Height, contentDescription = null) },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    OutlinedTextField(
+                        value = weightState,
+                        onValueChange = { weightState = it },
+                        label = { Text("وزن (کیلوگرم)") },
+                        leadingIcon = { Icon(imageVector = Icons.Default.MonitorWeight, contentDescription = null) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                }
+            }
+        }
+
+        // 2. Preferences Card (Notifications & Theme)
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Text(
+                        text = "تنظیمات یادآور و ظاهر برنامه",
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Dark Theme Switch
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(imageVector = Icons.Default.DarkMode, contentDescription = null, tint = MaterialTheme.colorScheme.secondary)
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(text = "حالت تاریک (Dark Mode)")
+                        }
+                        Switch(
+                            checked = darkThemeState,
+                            onCheckedChange = { darkThemeState = it }
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Notification Switch
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(imageVector = Icons.Default.NotificationsActive, contentDescription = null, tint = MaterialTheme.colorScheme.secondary)
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(text = "اعلان یادآوری روزانه")
+                        }
+                        Switch(
+                            checked = reminderEnabledState,
+                            onCheckedChange = { reminderEnabledState = it }
+                        )
+                    }
+
+                    if (reminderEnabledState) {
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Text(
+                            text = "ساعت یادآوری: ${reminderHourState.toInt().toString().padStart(2, '0')}:${reminderMinuteState.toInt().toString().padStart(2, '0')}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Sliders for hour & minute to keep it simple and visual
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(text = "ساعت", fontSize = 12.sp, modifier = Modifier.width(40.dp))
+                            Slider(
+                                value = reminderHourState,
+                                onValueChange = { reminderHourState = it },
+                                valueRange = 0f..23f,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(text = "دقیقه", fontSize = 12.sp, modifier = Modifier.width(40.dp))
+                            Slider(
+                                value = reminderMinuteState,
+                                onValueChange = { reminderMinuteState = it },
+                                valueRange = 0f..59f,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // 3. Save Button
+        item {
+            Button(
+                onClick = {
+                    val age = ageState.toIntOrNull() ?: 25
+                    val height = heightState.toFloatOrNull() ?: 175f
+                    val weight = weightState.toFloatOrNull() ?: 68f
+                    viewModel.updateProfile(
+                        name = nameState,
+                        age = age,
+                        height = height,
+                        weight = weight,
+                        isDark = darkThemeState,
+                        reminder = reminderEnabledState,
+                        hour = reminderHourState.toInt(),
+                        minute = reminderMinuteState.toInt()
+                    )
+                    showSavedMessage = true
+                },
+                modifier = Modifier.fillMaxWidth().height(56.dp).testTag("save_settings_button"),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Icon(imageVector = Icons.Default.Save, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("ذخیره تغییرات", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+
+        // Confirmation Message
+        item {
+            if (showSavedMessage) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(imageVector = Icons.Default.CheckCircle, contentDescription = null, tint = Color(0xFF2E7D32))
+                        Text("تغییرات با موفقیت ذخیره شد.", color = Color(0xFF1B5E20), fontSize = 14.sp)
+                    }
+                }
+            }
+        }
+
+        // 4. Critical / Reset System Settings Card
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.15f))
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Text(
+                        text = "منطقه بحرانی",
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "با بازنشانی برنامه، تمامی اطلاعات ثبت شده، روزهای انجام شده تمرینی، رکوردها و تنظیمات کاربری شما حذف خواهند شد.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        onClick = { showResetDialog = true },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text("حذف تمام اطلاعات و بازنشانی برنامه")
+                    }
+                }
+            }
+        }
+    }
+
+    // Reset System Dialog
+    if (showResetDialog) {
+        AlertDialog(
+            onDismissRequest = { showResetDialog = false },
+            title = { Text("آیا مطمئن هستید؟", textAlign = TextAlign.Right) },
+            text = { Text("تمامی اطلاعات صخره‌نورد و رکوردها برای همیشه حذف خواهد شد.", textAlign = TextAlign.Right) },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.resetAllApp()
+                        showResetDialog = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("بله، بازنشانی کن")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetDialog = false }) {
+                    Text("انصراف")
+                }
+            }
+        )
+    }
+}
