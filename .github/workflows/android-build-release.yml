@@ -44,16 +44,16 @@ jobs:
             gradle assembleDebug
           fi
 
-      - name: Find and Rename APK
+      - name: Copy Generated APK to Artifacts
         run: |
           mkdir -p build-artifacts
-          find . -name "*.apk" -exec cp {} build-artifacts/GripTrainer-debug.apk \;
+          find app/build/outputs/apk/ -name "*.apk" -exec cp {} build-artifacts/ \;
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: GripTrainer-debug-apk
-          path: build-artifacts/GripTrainer-debug.apk
+          name: GripTrainer-apks
+          path: build-artifacts/*.apk
 
   release:
     name: Create Auto Release
@@ -67,13 +67,13 @@ jobs:
       - name: Download Build Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: GripTrainer-debug-apk
+          name: GripTrainer-apks
           path: release-artifacts
 
       - name: Generate Github Release
         uses: softprops/action-gh-release@v2
         with:
-          files: release-artifacts/GripTrainer-debug.apk
+          files: release-artifacts/*.apk
           tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || 'latest' }}
           name: ${{ startsWith(github.ref, 'refs/tags/v') && format('Release {0}', github.ref_name) || 'آخرین نسخه بیلد شده (Latest Build)' }}
           draft: false
