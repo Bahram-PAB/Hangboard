@@ -12,12 +12,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.R
 import com.example.ui.MainViewModel
 
 @Composable
@@ -36,6 +39,8 @@ fun SettingsScreen(viewModel: MainViewModel) {
 
     var showResetDialog by remember { mutableStateOf(false) }
     var showSavedMessage by remember { mutableStateOf(false) }
+
+    val uriHandler = LocalUriHandler.current
 
     LazyColumn(
         modifier = Modifier
@@ -262,61 +267,85 @@ fun SettingsScreen(viewModel: MainViewModel) {
             }
         }
 
-        // 4. Critical / Reset System Settings Card
+        // 4. App Version & Social Links Card
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.15f))
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
-                Column(modifier = Modifier.padding(20.dp)) {
-                    Text(
-                        text = "منطقه بحرانی",
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.error
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(28.dp)
                     )
+                    
                     Spacer(modifier = Modifier.height(8.dp))
+                    
                     Text(
-                        text = "با بازنشانی برنامه، تمامی اطلاعات ثبت شده، روزهای انجام شده تمرینی، رکوردها و تنظیمات کاربری شما حذف خواهند شد.",
-                        style = MaterialTheme.typography.bodySmall,
+                        text = "تمرینیار هنگبرد",
+                        fontWeight = FontWeight.ExtraBold,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    
+                    Spacer(modifier = Modifier.height(4.dp))
+                    
+                    Text(
+                        text = "نسخه برنامه: V0.2.0",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    
                     Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        onClick = { showResetDialog = true },
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp)
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Text("حذف تمام اطلاعات و بازنشانی برنامه")
+                        // GitHub Button
+                        OutlinedButton(
+                            onClick = { uriHandler.openUri("https://github.com/Bahram-PAB/Hangboard") },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_github),
+                                contentDescription = "گیت‌هاب",
+                                tint = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("گیت‌هاب", fontWeight = FontWeight.Bold)
+                        }
+                        
+                        // Telegram Button
+                        OutlinedButton(
+                            onClick = { uriHandler.openUri("https://telegram.me/gharibe_ir") },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_telegram),
+                                contentDescription = "تلگرام",
+                                tint = Color(0xFF24A1DE),
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("تلگرام", fontWeight = FontWeight.Bold)
+                        }
                     }
                 }
             }
         }
-    }
-
-    // Reset System Dialog
-    if (showResetDialog) {
-        AlertDialog(
-            onDismissRequest = { showResetDialog = false },
-            title = { Text("آیا مطمئن هستید؟", textAlign = TextAlign.Right) },
-            text = { Text("تمامی اطلاعات صخره‌نورد و رکوردها برای همیشه حذف خواهد شد.", textAlign = TextAlign.Right) },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        viewModel.resetAllApp()
-                        showResetDialog = false
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                ) {
-                    Text("بله، بازنشانی کن")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showResetDialog = false }) {
-                    Text("انصراف")
-                }
-            }
-        )
     }
 }
