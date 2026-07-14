@@ -298,7 +298,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
                     Spacer(modifier = Modifier.height(4.dp))
                     
                     Text(
-                        text = "نسخه برنامه: V0.2.0",
+                        text = "نسخه برنامه: V0.2.1",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -330,7 +330,7 @@ fun SettingsScreen(viewModel: MainViewModel) {
                         
                         // Telegram Button
                         OutlinedButton(
-                            onClick = { uriHandler.openUri("https://telegram.me/gharibe_ir") },
+                            onClick = { uriHandler.openUri("https://t.me/gharibe_ir") },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp)
                         ) {
